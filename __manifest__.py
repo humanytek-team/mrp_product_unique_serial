@@ -14,6 +14,7 @@
     'version': '0.1.0',
     'depends': ['mrp'],
     'data': [
+        'views/stock_move_views.xml',
     ],
     'demo': [
     ],
