@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_stock_move_lots_form_inherit" model="ir.ui.view">
+            <field name="name">stock.move.lots.form.inherit</field>
+            <field name="model">stock.move</field>
+            <field name="inherit_id" ref="mrp.view_stock_move_lots" />
+            <field name="arch" type="xml">
+
+              <xpath expr="//field[@name='lot_id']" position="attributes">
+                <attribute name="domain">
+                  [('product_id', '=', parent.product_id), ('stock_move_lots_ids', '=', False)]
+                </attribute>
+              </xpath>
+
+            </field>
+        </record>
+
+</odoo>
