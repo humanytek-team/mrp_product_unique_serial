@@ -7,4 +7,4 @@ class StockMoveLots(models.Model):
 
     lot_id = fields.Many2one(
         'stock.production.lot', 'Lot',
-        domain="[('product_id', '!=', product_id)]")
+        domain="[('product_id', '=', product_id), ('stock_move_lots_ids', '=', False)]")
