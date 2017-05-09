@@ -15,6 +15,7 @@
     'depends': ['mrp'],
     'data': [
         'views/stock_move_views.xml',
+        'views/mrp_workorder_views.xml',
     ],
     'demo': [
     ],
