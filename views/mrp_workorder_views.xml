@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_mrp_workorder_form_inherit" model="ir.ui.view">
+            <field name="name">mrp.workorder.form.inherit</field>
+            <field name="model">mrp.workorder</field>
+            <field name="inherit_id" ref="mrp.mrp_production_workcenter_form_view_inherit" />
+            <field name="arch" type="xml">
+
+              <xpath expr="//field[@name='lot_id']" position="attributes">
+                <attribute name="context">
+                  {'default_product_id': product_id, 'production_id': parent.production_id}
+                </attribute>
+                <attribute name="domain">
+                  [('available_for_product_in_workorder', '=', True)]
+                </attribute>
+              </xpath>
+
+            </field>
+        </record>
+
+</odoo>
