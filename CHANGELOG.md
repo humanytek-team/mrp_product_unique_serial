@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2017-05-09
+### Added
+- mrp_product_unique_serial: Adds computed field to model mrp.workorder to calculate if a lot/serial number is available for use in a product in a workorder (form view).
+
 ## [0.1.1] - 2017-05-05
 ### Removed
 - mrp_product_unique_serial: Remove extension of model stock.move.lots to fix the unwanted effects of domain of field lot_id in other process of production (work orders).
