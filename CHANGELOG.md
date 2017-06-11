@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2017-06-11
+### Changed
+- mrp_product_unique_serial: Add domain to field final_lot_id in form view of workorders to filter serial numbers for the product final that have not used in other production process.
+
 ## [0.2.0] - 2017-05-09
 ### Added
 - mrp_product_unique_serial: Adds computed field to model mrp.workorder to calculate if a lot/serial number is available for use in a product in a workorder (form view).
