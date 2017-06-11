@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- mrp_product_unique_serial: Add domain to field final_lot_id in form view of workorders to filter serial numbers for the product final that have not used in other production process.
 
 ## [0.2.0] - 2017-05-09
 ### Added
