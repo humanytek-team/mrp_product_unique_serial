@@ -6,72 +6,80 @@ from odoo import models, fields, api
 class ProductionLot(models.Model):
     _inherit = 'stock.production.lot'
 
-    stock_move_lots_ids = fields.One2many(
-        'stock.move.lots', 'lot_id', 'Stock Moves', readonly=True)
     available_for_product_in_workorder = fields.Boolean(
         compute='_compute_available_for_product_in_workorder',
         search='_search_available_for_product_in_workorder'
     )
+    available_for_final_lot_in_workorder = fields.Boolean(
+        compute='_compute_available_for_product_in_workorder',
+        search='_search_available_for_final_lot_in_workorder'
+    )
 
-    @api.depends('stock_move_lots_ids')
     def _compute_available_for_product_in_workorder(self):
         for record in self:
-            record.available_for_product_in_workorder = False
-            if not record.stock_move_lots_ids:
-                record.available_for_product_in_workorder = True
-            else:
-                if len(record.stock_move_lots_ids) == 1:
-                    if not record.stock_move_lots_ids[0].lot_produced_id:
-                        record.available_for_product_in_workorder = True
-                if len(record.stock_move_lots_ids) == 2:
-                    record.available_for_product_in_workorder = not bool(
-                        [stock_move_lot.id for stock_move_lot in
-                        record.stock_move_lots_ids
-                        if stock_move_lot.done_wo == False]
-                        )
+            record.available_for_product_in_workorder = True
+            record.available_for_final_lot_in_workorder = True
 
     def _search_available_for_product_in_workorder(self, operator, value):
+        """Function of searching for computed field
+        available_for_product_in_workorder."""
+
         product_id = self.env.context['default_product_id']
         production_id = self.env.context['production_id']
-        stock_production_lot_ids = self.search(
-            ['|',
-            '&',
+        StockMove = self.env['stock.move']
+        product_moves = StockMove \
+            .search([
+                ('product_id', '=', product_id),
+                ('raw_material_production_id', '!=', False),
+                ('raw_material_production_id', '!=', production_id),
+                ])
+        all_lots_reserved_ids = product_moves.mapped('lot_ids.id')
+
+        product_lots_available_tmp = self.search([
             ('product_id', '=', product_id),
-            '|',
-            ('stock_move_lots_ids', '=', False),
-            '&',
-            ('stock_move_lots_ids.production_id', '=', production_id),
-            ('stock_move_lots_ids.lot_produced_id', '=', False),
-            '&',
-            ('product_id', '=', product_id),
-            '&',
-            ('stock_move_lots_ids.production_id', '!=', production_id),
-            ('stock_move_lots_ids.lot_produced_id', '=', False),
+            ('id', 'not in', all_lots_reserved_ids)
+        ])
+
+        StockMoveLots = self.env['stock.move.lots']
+        active_move_lots = StockMoveLots.search([
+            ('lot_id', 'in', product_lots_available_tmp.mapped('id')),
+            ('done_wo', '=', False),
+        ]).mapped('lot_id')
+
+        product_lots_available = product_lots_available_tmp - \
+            active_move_lots
+
+        product_lots_available_ids = list()
+        for lot in product_lots_available:
+            lot_used = StockMoveLots.search([
+                ('lot_id', '=', lot.id),
+                ('done_wo', '=', True),
+                ('lot_produced_id', '!=', False),
+                ('quantity_done', '>', 0),
             ])
+            if not lot_used:
+                product_lots_available_ids.append(lot.id)
 
-        lots_ids_available_for_product_in_workorder = []
-        for stock_production_lot in stock_production_lot_ids:
-            if stock_production_lot.stock_move_lots_ids:
-                stock_move_lots_done_wo = True
-                stock_move_lots_quantity_done = 0.0
-                stock_move_lots_produced_id = False
-                for stock_move_lot in stock_production_lot.stock_move_lots_ids:
-                    if not stock_move_lot.done_wo:
-                        stock_move_lots_done_wo = False
-                    if stock_move_lot.quantity_done > 0:
-                        stock_move_lots_quantity_done = 1
-                    if stock_move_lot.lot_produced_id:
-                        stock_move_lots_produced_id = True
-                if not stock_move_lots_produced_id and \
-                    stock_move_lots_quantity_done == 0.0:
-                    lots_ids_available_for_product_in_workorder.append(
-                        stock_production_lot.id)
-                elif not stock_move_lots_produced_id and \
-                    stock_move_lots_done_wo:
-                    lots_ids_available_for_product_in_workorder.append(
-                        stock_production_lot.id)
-            else:
-                lots_ids_available_for_product_in_workorder.append(
-                    stock_production_lot.id)
+        return [('id', 'in', product_lots_available_ids)]
 
-        return [('id', 'in', sorted(lots_ids_available_for_product_in_workorder))]
+    def _search_available_for_final_lot_in_workorder(self, operator, value):
+        """Function of searching for computed field
+        available_for_final_lot_in_workorder."""
+
+        product_id = self.env.context['default_product_id']
+        production_id = self.env.context['production_id']
+        StockMove = self.env['stock.move']
+        product_moves = StockMove \
+            .search([
+                ('product_id', '=', product_id),
+                ('production_id', '!=', False),
+                ('production_id', '!=', production_id),
+                ])
+        all_lots_reserved_ids = product_moves.mapped('lot_ids.id')
+
+        product_lots_available_ids = self.search([
+            ('product_id', '=', product_id),
+            ('id', 'not in', all_lots_reserved_ids)
+        ]).mapped('id')
+
+        return [('id', 'in', product_lots_available_ids)]

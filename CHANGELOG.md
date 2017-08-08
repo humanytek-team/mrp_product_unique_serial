@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [0.3.1] - 2017-08-08
+### Changed
+- Fix error in form view of workorder on filter of series for raw material and product finished. Also the code was refactored.
+
 ## [0.3.0] - 2017-06-11
 ### Changed
 - mrp_product_unique_serial: Add domain to field final_lot_id in form view of workorders to filter serial numbers for the product final that have not used in other production process.
