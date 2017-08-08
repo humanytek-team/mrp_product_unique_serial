@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Changed
+- Fix error in form view of workorder on filter of series for raw material and product finished. Also the code was refactored.
 
 ## [0.3.0] - 2017-06-11
 ### Changed
