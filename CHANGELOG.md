@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.3.2] - 2017-08-18
+### Changed
+- Fix error in form view of workorder on filter of series for raw material and product finished. Also the code was refactored.
+
 ## [0.3.1] - 2017-08-08
 ### Changed
 - Fix error in form view of workorder on filter of series for raw material and product finished. Also the code was refactored.

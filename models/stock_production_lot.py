@@ -57,8 +57,19 @@ class ProductionLot(models.Model):
                 ('lot_produced_id', '!=', False),
                 ('quantity_done', '>', 0),
             ])
+
             if not lot_used:
                 product_lots_available_ids.append(lot.id)
+
+            elif len(lot_used) == 1:
+                MrpProduction = self.env['mrp.production']
+                lot_used_in_same_product = MrpProduction.search([
+                    ('product_id', '=', product_id),
+                    ('move_finished_ids.active_move_lot_ids', 'in', lot_used.id),
+                ])
+
+                if lot_used_in_same_product:
+                    product_lots_available_ids.append(lot.id)
 
         return [('id', 'in', product_lots_available_ids)]
 
