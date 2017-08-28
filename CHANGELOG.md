@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 
+## [0.4.0] - 2017-08-28
+### added
+- Adds filter of series for final product produced in workorders of more of one unity of products to produce.
+
 ## [0.3.2] - 2017-08-18
 ### Changed
 - Fix error in form view of workorder on filter of series for raw material and product finished. Also the code was refactored.
