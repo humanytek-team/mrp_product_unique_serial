@@ -79,6 +79,11 @@ class ProductionLot(models.Model):
 
         product_id = self.env.context['default_product_id']
         production_id = self.env.context['production_id']
+        workorder_id = self.env.context['workorder_id']
+        import logging
+        _logger = logging.getLogger(__name__)
+        _logger.debug('DEBUG CONTEXT %s', self.env.context)
+        _logger.debug('DEBUG WORKORDER ID %s', workorder_id)
         StockMove = self.env['stock.move']
         product_moves = StockMove \
             .search([
@@ -88,9 +93,33 @@ class ProductionLot(models.Model):
                 ])
         all_lots_reserved_ids = product_moves.mapped('lot_ids.id')
 
-        product_lots_available_ids = self.search([
+        product_lots_available_tmp = self.search([
             ('product_id', '=', product_id),
             ('id', 'not in', all_lots_reserved_ids)
-        ]).mapped('id')
+        ])
+
+        StockMoveLots = self.env['stock.move.lots']
+        active_move_lots_in_wo = StockMoveLots.search([
+            ('lot_id', 'in', product_lots_available_tmp.mapped('id')),
+            ('done_wo', '=', True),
+            ('workorder_id', '!=', False),
+            ('quantity_done', '>', 0),
+        ]).mapped('lot_id')
+
+        product_lots_available = product_lots_available_tmp - \
+            active_move_lots_in_wo
+
+        product_lots_available_ids = list()
+        for lot in product_lots_available:
+            lot_used = StockMoveLots.search([
+                ('lot_produced_id', '=', lot.id),
+                ('workorder_id', '!=', False),
+                ('workorder_id', '=', workorder_id),
+                ('quantity_done', '>', 0),
+                ('done_wo', '=', True),
+            ])
+
+            if not lot_used:
+                product_lots_available_ids.append(lot.id)
 
         return [('id', 'in', product_lots_available_ids)]
