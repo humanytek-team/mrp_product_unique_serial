@@ -5,7 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
+### added
+- Adds filter of series for final product produced in workorders of more of one unity of products to produce. 
 
 ## [0.3.2] - 2017-08-18
 ### Changed
